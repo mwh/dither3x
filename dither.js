@@ -10,6 +10,14 @@
 export function dither(r, g, b, px=1) {
     let swapRB = false, swapGB = false, swapRG = false;
 
+    if (typeof r == 'string' && r[0] == '#' && r.length == 7) {
+        const hex = r;
+        if (g)
+            px = g;
+        r = Number.parseInt(hex.substring(1,3), 16);
+        g = Number.parseInt(hex.substring(3,5), 16);
+        b = Number.parseInt(hex.substring(5,7), 16);
+    }
     // compute symmetry
     // This maps the RGB values into tetrahedral space 0, with r >= g >= b.
     if (r < b) {
