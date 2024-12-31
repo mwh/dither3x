@@ -66,6 +66,64 @@ export function dither(r, g, b, px=1) {
 export default dither;
 
 /**
+ * Produce an 8x8 dither pattern for a given colour, using the algorithm from
+ * US Patent 5485558 used in Windows 3.
+ * @param {number} r  red component 0-255
+ * @param {number} g  green component 0-255
+ * @param {number} b  blue component 0-255
+ * @returns {string[][]} row-major 8x8 matrix of hex colours
+ */
+export function matrix(r, g, b) {
+    let swapRB = false, swapGB = false, swapRG = false;
+
+    if (typeof r == 'string' && r[0] == '#' && r.length == 7) {
+        const hex = r;
+        r = Number.parseInt(hex.substring(1,3), 16);
+        g = Number.parseInt(hex.substring(3,5), 16);
+        b = Number.parseInt(hex.substring(5,7), 16);
+    }
+    // compute symmetry
+    // This maps the RGB values into tetrahedral space 0, with r >= g >= b.
+    if (r < b) {
+        [r, b] = [b, r];
+        swapRB = true;
+    }
+    if (g < b) {
+        [g, b] = [b, g];
+        swapGB = true;
+    }
+    if (r < g) {
+        [r, g] = [g, r];
+        swapRG = true;
+    }
+
+    let subspace = computeSubspace(r, g, b);
+    
+    r = scale(r);
+    g = scale(g);
+    b = scale(b);
+
+    let [c1, c2, c3] = computeTransform(subspace, r, g, b);
+
+    let cc = makeColourCntTable(subspace, c1, c2, c3);
+
+    cc = computePColour(cc, swapRB, swapGB, swapRG);
+
+    cc = sortColourCntTable(cc);
+
+    let output = makeDitherBitmap(cc);
+
+    let matrix = [[],[],[],[],[],[],[],[]];
+    for (let x = 0; x < 8; x++) {
+        for (let y = 0; y < 8; y++) {
+            let ibgr = output[x + y * 8];
+            matrix[y][x] = palette[ibgr];
+        }
+    }
+    return matrix;
+}
+
+/**
  * The 16-colour palette used in the dithering algorithm,
  * in ascending IBGR order.
  * Slot 8 is unused.
