@@ -1,3 +1,4 @@
+// Dither pattern generator by Michael Homer 2024, 2025
 /**
  * Produce an 8x8 dither pattern for a given colour, using the algorithm from
  * US Patent 5485558 used in Windows 3.
