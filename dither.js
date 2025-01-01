@@ -1,10 +1,10 @@
 /**
  * Produce an 8x8 dither pattern for a given colour, using the algorithm from
  * US Patent 5485558 used in Windows 3.
- * @param {number} r  red component 0-255
- * @param {number} g  green component 0-255
- * @param {number} b  blue component 0-255
- * @param {number} px size of dither pixels in pixels
+ * @param {number | string} r  red component 0-255, or #RRGGBB hex string
+ * @param {number} [g]  green component 0-255; sets px if given when r is string
+ * @param {number} [b]  blue component 0-255
+ * @param {number} [px=1] size of dither pixels in pixels
  * @returns {string} data url of an 8x8 dithered image of the colour
  */
 export function dither(r, g, b, px=1) {
@@ -68,9 +68,9 @@ export default dither;
 /**
  * Produce an 8x8 dither pattern for a given colour, using the algorithm from
  * US Patent 5485558 used in Windows 3.
- * @param {number} r  red component 0-255
- * @param {number} g  green component 0-255
- * @param {number} b  blue component 0-255
+ * @param {number | string} r  red component 0-255, or #RRGGBB hex string
+ * @param {number} [g]  green component 0-255; ignored if r is string
+ * @param {number} [b]  blue component 0-255; ignored if r is string
  * @returns {string[][]} row-major 8x8 matrix of hex colours
  */
 export function matrix(r, g, b) {
