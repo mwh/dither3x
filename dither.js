@@ -9,46 +9,13 @@
  * @returns {string} data url of an 8x8 dithered image of the colour
  */
 export function dither(r, g, b, px=1) {
-    let swapRB = false, swapGB = false, swapRG = false;
 
     if (typeof r == 'string' && r[0] == '#' && r.length == 7) {
-        const hex = r;
         if (g)
             px = g;
-        r = Number.parseInt(hex.substring(1,3), 16);
-        g = Number.parseInt(hex.substring(3,5), 16);
-        b = Number.parseInt(hex.substring(5,7), 16);
-    }
-    // compute symmetry
-    // This maps the RGB values into tetrahedral space 0, with r >= g >= b.
-    if (r < b) {
-        [r, b] = [b, r];
-        swapRB = true;
-    }
-    if (g < b) {
-        [g, b] = [b, g];
-        swapGB = true;
-    }
-    if (r < g) {
-        [r, g] = [g, r];
-        swapRG = true;
     }
 
-    let subspace = computeSubspace(r, g, b);
-    
-    r = scale(r);
-    g = scale(g);
-    b = scale(b);
-
-    let [c1, c2, c3] = computeTransform(subspace, r, g, b);
-
-    let cc = makeColourCntTable(subspace, c1, c2, c3);
-
-    cc = computePColour(cc, swapRB, swapGB, swapRG);
-
-    cc = sortColourCntTable(cc);
-
-    let output = makeDitherBitmap(cc);
+    let mat = matrix(r, g, b);
 
     let canvas = document.createElement('canvas');
     canvas.width = 8 * px;
@@ -57,8 +24,7 @@ export function dither(r, g, b, px=1) {
 
     for (let x = 0; x < 8; x++) {
         for (let y = 0; y < 8; y++) {
-            let ibgr = output[x + y * 8];
-            ctx.fillStyle = palette[ibgr];
+            ctx.fillStyle = mat[y][x];
             ctx.fillRect(x * px, y * px, px, px);
         }
     }
